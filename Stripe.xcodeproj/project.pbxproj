@@ -233,8 +233,8 @@
 		04B31DFA1D11AC6400EF1631 /* STPUserInformation.h in Headers */ = {isa = PBXBuildFile; fileRef = 04B31DF71D11AC6400EF1631 /* STPUserInformation.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		04B31DFB1D11AC6400EF1631 /* STPUserInformation.m in Sources */ = {isa = PBXBuildFile; fileRef = 04B31DF81D11AC6400EF1631 /* STPUserInformation.m */; };
 		04B31DFC1D11AC6400EF1631 /* STPUserInformation.m in Sources */ = {isa = PBXBuildFile; fileRef = 04B31DF81D11AC6400EF1631 /* STPUserInformation.m */; };
-		04B31DFF1D131D9000EF1631 /* STPPaymentCardTextFieldCell.h in Headers */ = {isa = PBXBuildFile; fileRef = 04B31DFD1D131D9000EF1631 /* STPPaymentCardTextFieldCell.h */; };
-		04B31E001D131D9000EF1631 /* STPPaymentCardTextFieldCell.h in Headers */ = {isa = PBXBuildFile; fileRef = 04B31DFD1D131D9000EF1631 /* STPPaymentCardTextFieldCell.h */; };
+		04B31DFF1D131D9000EF1631 /* STPPaymentCardTextFieldCell.h in Headers */ = {isa = PBXBuildFile; fileRef = 04B31DFD1D131D9000EF1631 /* STPPaymentCardTextFieldCell.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		04B31E001D131D9000EF1631 /* STPPaymentCardTextFieldCell.h in Headers */ = {isa = PBXBuildFile; fileRef = 04B31DFD1D131D9000EF1631 /* STPPaymentCardTextFieldCell.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		04B31E011D131D9000EF1631 /* STPPaymentCardTextFieldCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 04B31DFE1D131D9000EF1631 /* STPPaymentCardTextFieldCell.m */; };
 		04B31E021D131D9000EF1631 /* STPPaymentCardTextFieldCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 04B31DFE1D131D9000EF1631 /* STPPaymentCardTextFieldCell.m */; };
 		04B33F361BC7488D00DD8120 /* Info.plist in Copy Files */ = {isa = PBXBuildFile; fileRef = 04B33F301BC7417B00DD8120 /* Info.plist */; };
@@ -2155,6 +2155,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				04B31E001D131D9000EF1631 /* STPPaymentCardTextFieldCell.h in Headers */,
 				04EBC7561B7533C300A0E6AE /* STPCardValidationState.h in Headers */,
 				04F94DA11D229F12004FC826 /* STPAddressFieldTableViewCell.h in Headers */,
 				04EBC75A1B7533C300A0E6AE /* STPCardValidator.h in Headers */,
@@ -2199,7 +2200,6 @@
 				C15993401D88089E0047950D /* STPShippingMethodTableViewCell.h in Headers */,
 				04B31DD51D08E6E200EF1631 /* STPCustomer.h in Headers */,
 				04633AFB1CD1299B009D4FB5 /* NSString+Stripe.h in Headers */,
-				04B31E001D131D9000EF1631 /* STPPaymentCardTextFieldCell.h in Headers */,
 				04BFFFDA1D240B13005F2340 /* STPAddCardViewController+Private.h in Headers */,
 				C1717DB11CC00ED60009CF4A /* STPAddress.h in Headers */,
 				04B31DE71D09D25F00EF1631 /* STPPaymentMethodsInternalViewController.h in Headers */,
@@ -2300,6 +2300,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				04B31DFF1D131D9000EF1631 /* STPPaymentCardTextFieldCell.h in Headers */,
 				C15993361D8808680047950D /* STPShippingMethodsViewController.h in Headers */,
 				F1A2F92C1EEB6A70006B0456 /* NSCharacterSet+Stripe.h in Headers */,
 				F1D3A24E1EB012010095BFA9 /* STPMultipartFormDataPart.h in Headers */,
@@ -2332,7 +2333,6 @@
 				F13FCA591F8BFFCC00EB69B2 /* STPCustomer+SourceTuple.h in Headers */,
 				C1FEE5961CBFF11400A7632B /* STPPostalCodeValidator.h in Headers */,
 				04633B0C1CD44F6C009D4FB5 /* PKPayment+Stripe.h in Headers */,
-				04B31DFF1D131D9000EF1631 /* STPPaymentCardTextFieldCell.h in Headers */,
 				04CDB50A1A5F30A700B854EE /* STPBankAccount.h in Headers */,
 				F1DEB88A1E2047CA0066B8E8 /* STPCoreTableViewController.h in Headers */,
 				C1A06F101E1D8A7F004DCA06 /* STPCard+Private.h in Headers */,
