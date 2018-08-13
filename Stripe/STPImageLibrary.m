@@ -86,15 +86,15 @@
 }
 
 + (UIImage *)largeCardFrontImageOne {
-    return [self safeImageNamed:@"stp_card_form_front_1" templateIfAvailable:YES];
+    return [self safeImageNamed:stpCardFormFrontOneIdentifier templateIfAvailable:YES];
 }
 
 + (UIImage *)largeCardFrontImageTwo {
-	return [self safeImageNamed:@"stp_card_form_front_2" templateIfAvailable:YES];
+	return [self safeImageNamed:stpCardFormFrontTwoIdentifier templateIfAvailable:YES];
 }
 
 + (UIImage *)largeCardBackImage {
-    return [self safeImageNamed:@"stp_card_form_back" templateIfAvailable:YES];
+    return [self safeImageNamed:stpCardFormBackIdentifier templateIfAvailable:YES];
 }
 
 + (UIImage *)largeShippingImage {
@@ -112,6 +112,8 @@
     if (templateIfAvailable) {
         image = [image imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
     }
+
+	image.accessibilityIdentifier = imageName;
     return image;
 }
 

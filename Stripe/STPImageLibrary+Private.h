@@ -11,6 +11,10 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+static NSString *stpCardFormFrontOneIdentifier = @"stp_card_form_front_1";
+static NSString *stpCardFormFrontTwoIdentifier = @"stp_card_form_front_2";
+static NSString *stpCardFormBackIdentifier = @"stp_card_form_back";
+
 @interface STPImageLibrary (Private)
 
 + (UIImage *)addIcon;
