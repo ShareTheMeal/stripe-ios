@@ -15,7 +15,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (UIImage *)addIcon;
 + (UIImage *)checkmarkIcon;
-+ (UIImage *)largeCardFrontImage;
++ (UIImage *)largeCardFrontImageOne;
++ (UIImage *)largeCardFrontImageTwo;
 + (UIImage *)largeCardBackImage;
 + (UIImage *)largeShippingImage;
 

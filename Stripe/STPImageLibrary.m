@@ -85,8 +85,12 @@
     return [self safeImageNamed:@"stp_icon_checkmark" templateIfAvailable:YES];
 }
 
-+ (UIImage *)largeCardFrontImage {
-    return [self safeImageNamed:@"stp_card_form_front" templateIfAvailable:YES];
++ (UIImage *)largeCardFrontImageOne {
+    return [self safeImageNamed:@"stp_card_form_front_1" templateIfAvailable:YES];
+}
+
++ (UIImage *)largeCardFrontImageTwo {
+	return [self safeImageNamed:@"stp_card_form_front_2" templateIfAvailable:YES];
 }
 
 + (UIImage *)largeCardBackImage {

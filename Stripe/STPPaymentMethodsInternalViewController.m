@@ -82,10 +82,10 @@ static NSInteger const PaymentMethodSectionAddCard = 1;
     self.tableView.delegate = self;
 
     // Table header view
-    UIImageView *cardImageView = [[UIImageView alloc] initWithImage:[STPImageLibrary largeCardFrontImage]];
+    UIImageView *cardImageView = [[UIImageView alloc] initWithImage:[STPImageLibrary largeCardFrontImageOne]];
     cardImageView.contentMode = UIViewContentModeCenter;
     cardImageView.frame = CGRectMake(0.0, 0.0, self.view.bounds.size.width, cardImageView.bounds.size.height + (57.0f * 2.0f));
-    cardImageView.image = [STPImageLibrary largeCardFrontImage];
+    cardImageView.image = [STPImageLibrary largeCardFrontImageOne];
     cardImageView.tintColor = self.theme.accentColor;
     self.cardImageView = cardImageView;
 

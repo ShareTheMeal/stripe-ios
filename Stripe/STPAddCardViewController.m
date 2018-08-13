@@ -106,7 +106,7 @@ typedef NS_ENUM(NSUInteger, STPPaymentCardSection) {
     self.stp_navigationItemProxy.rightBarButtonItem = doneItem;
     self.stp_navigationItemProxy.rightBarButtonItem.enabled = NO;
     
-    UIImageView *cardImageView = [[UIImageView alloc] initWithImage:[STPImageLibrary largeCardFrontImage]];
+    UIImageView *cardImageView = [[UIImageView alloc] initWithImage:[STPImageLibrary largeCardFrontImageOne]];
     cardImageView.contentMode = UIViewContentModeCenter;
     cardImageView.frame = CGRectMake(0, 0, self.view.bounds.size.width, cardImageView.bounds.size.height + (57 * 2));
     self.cardImageView = cardImageView;
@@ -378,21 +378,39 @@ typedef NS_ENUM(NSUInteger, STPPaymentCardSection) {
 }
 
 - (void)paymentCardTextFieldDidBeginEditingCVC:(__unused STPPaymentCardTextField *)textField {
-    [UIView transitionWithView:self.cardImageView
-                      duration:0.2
-                       options:UIViewAnimationOptionTransitionFlipFromRight
-                    animations:^{
-                        self.cardImageView.image = [STPImageLibrary largeCardBackImage];
-                    } completion:nil];
+	UIImage *image = [STPImageLibrary largeCardBackImage];
+	[self animationWithImage:image];
 }
 
-- (void)paymentCardTextFieldDidEndEditingCVC:(__unused STPPaymentCardTextField *)textField {
-    [UIView transitionWithView:self.cardImageView
-                      duration:0.2
-                       options:UIViewAnimationOptionTransitionFlipFromLeft
-                    animations:^{
-                        self.cardImageView.image = [STPImageLibrary largeCardFrontImage];
-                    } completion:nil];
+- (void)paymentCardTextFieldDidBeginEditingExpiration:(__unused STPPaymentCardTextField *)textField {
+	UIImage *image = [STPImageLibrary largeCardFrontImageTwo];
+	[self animationWithImage:image];
+}
+
+- (void)paymentCardTextFieldDidBeginEditingNumber:(__unused STPPaymentCardTextField *)textField {
+	UIImage *image = [STPImageLibrary largeCardFrontImageOne];
+	[self animationWithImage:image];
+}
+
+- (void)animationWithImage:(UIImage *)image {
+	UIViewAnimationOptions animationOption = UIViewAnimationOptionTransitionNone;
+	if (image == [STPImageLibrary largeCardFrontImageOne]) {
+		if (self.cardImageView.image == [STPImageLibrary largeCardBackImage])
+			animationOption = UIViewAnimationOptionTransitionFlipFromLeft;
+	} else if (image == [STPImageLibrary largeCardFrontImageTwo]) {
+		if (self.cardImageView.image == [STPImageLibrary largeCardBackImage])
+			animationOption = UIViewAnimationOptionTransitionFlipFromLeft;
+	} else if (image == [STPImageLibrary largeCardBackImage]) {
+		if (self.cardImageView.image == [STPImageLibrary largeCardFrontImageOne] || self.cardImageView.image == [STPImageLibrary largeCardFrontImageTwo])
+			animationOption = UIViewAnimationOptionTransitionFlipFromRight;
+	}
+
+	[UIView transitionWithView:self.cardImageView
+			duration:0.2
+			options:animationOption
+			animations:^{
+				self.cardImageView.image = image;
+			} completion:nil];
 }
 
 #pragma mark - STPAddressViewModelDelegate
