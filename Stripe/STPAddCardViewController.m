@@ -394,14 +394,12 @@ typedef NS_ENUM(NSUInteger, STPPaymentCardSection) {
 
 - (void)animationWithImage:(UIImage *)image {
 	UIViewAnimationOptions animationOption = UIViewAnimationOptionTransitionNone;
-	if (image == [STPImageLibrary largeCardFrontImageOne]) {
-		if (self.cardImageView.image == [STPImageLibrary largeCardBackImage])
+
+	if ([image.accessibilityIdentifier isEqualToString:stpCardFormFrontOneIdentifier] || [image.accessibilityIdentifier isEqualToString:stpCardFormFrontTwoIdentifier]) {
+		if ([self.cardImageView.image.accessibilityIdentifier isEqualToString: stpCardFormBackIdentifier])
 			animationOption = UIViewAnimationOptionTransitionFlipFromLeft;
-	} else if (image == [STPImageLibrary largeCardFrontImageTwo]) {
-		if (self.cardImageView.image == [STPImageLibrary largeCardBackImage])
-			animationOption = UIViewAnimationOptionTransitionFlipFromLeft;
-	} else if (image == [STPImageLibrary largeCardBackImage]) {
-		if (self.cardImageView.image == [STPImageLibrary largeCardFrontImageOne] || self.cardImageView.image == [STPImageLibrary largeCardFrontImageTwo])
+	} else if ([image.accessibilityIdentifier isEqualToString:stpCardFormBackIdentifier]) {
+		if ([self.cardImageView.image.accessibilityIdentifier isEqualToString: stpCardFormFrontOneIdentifier] || [self.cardImageView.image.accessibilityIdentifier isEqualToString: stpCardFormFrontTwoIdentifier])
 			animationOption = UIViewAnimationOptionTransitionFlipFromRight;
 	}
 
