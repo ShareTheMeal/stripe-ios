@@ -1111,6 +1111,11 @@
 		B3BDCAD520EEF5EC0034F7F5 /* STPPaymentIntentParams.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = STPPaymentIntentParams.h; path = PublicHeaders/STPPaymentIntentParams.h; sourceTree = "<group>"; };
 		B3BDCADE20F0142C0034F7F5 /* PaymentIntent.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = PaymentIntent.json; sourceTree = "<group>"; };
 		B3C9CF2C2004595A005502ED /* STPConnectAccountFunctionalTest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = STPConnectAccountFunctionalTest.m; sourceTree = "<group>"; };
+		B517EDA72123334600960F13 /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = Localizations/ar.lproj/Localizable.strings; sourceTree = "<group>"; };
+		B53B1DCE212455010086ACDE /* pt-PT */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-PT"; path = "Localizations/pt-PT.lproj/Localizable.strings"; sourceTree = "<group>"; };
+		B53B1DCF2124558B0086ACDE /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = Localizations/tr.lproj/Localizable.strings; sourceTree = "<group>"; };
+		B53B1DD0212455C60086ACDE /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = Localizations/ru.lproj/Localizable.strings; sourceTree = "<group>"; };
+		B53B1DD1212455DE0086ACDE /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = Localizations/ko.lproj/Localizable.strings; sourceTree = "<group>"; };
 		C1054F901FE197AE0033C87E /* STPPaymentContextSnapshotTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = STPPaymentContextSnapshotTests.m; sourceTree = "<group>"; };
 		C1080F471CBECF7B007B2D89 /* STPAddress.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = STPAddress.h; path = PublicHeaders/STPAddress.h; sourceTree = "<group>"; };
 		C1080F481CBECF7B007B2D89 /* STPAddress.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = STPAddress.m; sourceTree = "<group>"; };
@@ -2567,6 +2572,11 @@
 				fr,
 				fi,
 				nb,
+				ar,
+				"pt-PT",
+				tr,
+				ru,
+				ko,
 			);
 			mainGroup = 11C74B8D164043050071C2CA;
 			productRefGroup = 11C74B99164043050071C2CA /* Products */;
@@ -3179,6 +3189,11 @@
 				F148ABF11D5E81EB0014FD92 /* fr */,
 				7E0B1132203572FB00271AD3 /* fi */,
 				ED627D57207EA348007EFC56 /* nb */,
+				B517EDA72123334600960F13 /* ar */,
+				B53B1DCE212455010086ACDE /* pt-PT */,
+				B53B1DCF2124558B0086ACDE /* tr */,
+				B53B1DD0212455C60086ACDE /* ru */,
+				B53B1DD1212455DE0086ACDE /* ko */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";

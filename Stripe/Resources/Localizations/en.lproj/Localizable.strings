@@ -10,6 +10,9 @@
 /* Button to add a new credit card. */
 "Add New Card…" = "Add New Card…";
 
+/* Expiration Date */
+"MM/YY" = "MM/YY";
+
 /* Caption for Address field on address form */
 "Address" = "Address";
 

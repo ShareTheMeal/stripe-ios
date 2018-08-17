@@ -1,0 +1,5 @@
+/* Title for credit card number entry field */
+"Card" = "Card";
+
+/* Expiration Date */
+"MM/YY" = "MM/YY";
