@@ -7,6 +7,9 @@
 /* Button to add a new credit card. */
 "Add New Card…" = "新しいカードを追加...";
 
+/* Expiration Date */
+"MM/YY" = "MM/YY";
+
 /* Caption for Address field on address form */
 "Address" = "住所";
 

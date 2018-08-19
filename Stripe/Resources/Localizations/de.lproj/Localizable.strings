@@ -23,7 +23,7 @@
 "Billing Address" = "Rechnungsadresse";
 
 /* Title for credit card number entry field */
-"Card" = "Karte";
+"Card" = "Kreditkarte";
 
 /* accessibility label for text field */
 "card number" = "Kartennummer";
