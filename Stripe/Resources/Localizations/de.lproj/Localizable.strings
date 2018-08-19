@@ -7,6 +7,9 @@
 /* Button to add a new credit card. */
 "Add New Card…" = "Neue Karte hinzufügen…";
 
+/* Expiration Date */
+"MM/YY" = "MM/JJ";
+
 /* Caption for Address field on address form */
 "Address" = "Adresse";
 
@@ -20,7 +23,7 @@
 "Billing Address" = "Rechnungsadresse";
 
 /* Title for credit card number entry field */
-"Card" = "Karte";
+"Card" = "Kreditkarte";
 
 /* accessibility label for text field */
 "card number" = "Kartennummer";

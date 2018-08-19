@@ -1,0 +1,5 @@
+/* Title for credit card number entry field */
+"Card" = "Карта";
+
+/* Expiration Date */
+"MM/YY" = "ММ/ГГ";
