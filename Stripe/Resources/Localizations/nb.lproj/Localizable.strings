@@ -7,6 +7,9 @@
 /* Button to add a new credit card. */
 "Add New Card…" = "Legg til nytt kort…";
 
+/* Expiration Date */
+"MM/YY" = "MM/ÅÅ";
+
 /* Caption for Address field on address form */
 "Address" = "Adresse";
 
