@@ -16,6 +16,9 @@ extern NSString *const STPTestJSONCustomer;
 extern NSString *const STPTestJSONCard;
 
 extern NSString *const STPTestJSONPaymentIntent;
+extern NSString *const STPTestJSONSetupIntent;
+extern NSString *const STPTestJSONPaymentMethod;
+extern NSString *const STPTestJSONApplePayPaymentMethod;
 
 extern NSString *const STPTestJSONSource3DS;
 extern NSString *const STPTestJSONSourceAlipay;
@@ -127,12 +130,17 @@ extern NSString *const STPTestJSONSourceSOFORT;
 /**
  A Source object with type Alipay and a native redirect url
  */
-+ (STPSource *)alipaySourceWithNativeUrl;
++ (STPSource *)alipaySourceWithNativeURL;
 
 /**
  A PaymentIntent object
  */
 + (STPPaymentIntent *)paymentIntent;
+
+/**
+ A SetupIntent object
+ */
++ (STPSetupIntent *)setupIntent;
 
 /**
  A PaymentConfiguration object with a fake publishable key. Use this to avoid
@@ -155,6 +163,21 @@ extern NSString *const STPTestJSONSourceSOFORT;
  A fully specified STPLegalEntityParams
  */
 + (STPLegalEntityParams *)legalEntityParams;
+
+/**
+ A PaymentMethod object
+ */
++ (STPPaymentMethod *)paymentMethod;
+
+/**
+ A STPPaymentMethodCardParams object with a valid number, expMonth, expYear, and cvc.
+ */
++ (STPPaymentMethodCardParams *)paymentMethodCardParams;
+
+/**
+ An Apple Pay Payment Method object.
+ */
++ (STPPaymentMethod *)applePayPaymentMethod;
 
 @end
 

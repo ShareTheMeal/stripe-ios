@@ -22,6 +22,7 @@ static NSString *stpCardFormBackIdentifier = @"stp_card_form_back";
 + (UIImage *)largeCardFrontImageOne;
 + (UIImage *)largeCardFrontImageTwo;
 + (UIImage *)largeCardBackImage;
++ (UIImage *)largeCardAmexCVCImage;
 + (UIImage *)largeShippingImage;
 
 + (UIImage *)safeImageNamed:(NSString *)imageName
