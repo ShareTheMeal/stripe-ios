@@ -42,16 +42,57 @@
                        // PaymentIntentParams details (alphabetical)
                        [NSString stringWithFormat:@"clientSecret = %@", (self.clientSecret.length > 0) ? @"<redacted>" : @""],
                        [NSString stringWithFormat:@"receiptEmail = %@", self.receiptEmail],
-                       [NSString stringWithFormat:@"returnUrl = %@", self.returnUrl],
-                       [NSString stringWithFormat:@"saveSourceToCustomer = %@", (self.saveSourceToCustomer.boolValue) ? @"YES" : @"NO"],
+                       [NSString stringWithFormat:@"returnURL = %@", self.returnURL],
+                       [NSString stringWithFormat:@"savePaymentMethod = %@", (self.savePaymentMethod.boolValue) ? @"YES" : @"NO"],
+                       [NSString stringWithFormat:@"setupFutureUsage = %@", self.setupFutureUsage],
+                       
+                       // Source
                        [NSString stringWithFormat:@"sourceId = %@", self.sourceId],
                        [NSString stringWithFormat:@"sourceParams = %@", self.sourceParams],
+
+                       // PaymentMethod
+                       [NSString stringWithFormat:@"paymentMethodId = %@", self.paymentMethodId],
+                       [NSString stringWithFormat:@"paymentMethodParams = %@", self.paymentMethodParams],
 
                        // Additional params set by app
                        [NSString stringWithFormat:@"additionalAPIParameters = %@", self.additionalAPIParameters],
                        ];
 
     return [NSString stringWithFormat:@"<%@>", [props componentsJoinedByString:@"; "]];
+}
+
+- (nullable NSString *)setupFutureUsageRawString {
+    if (self.setupFutureUsage == nil) {
+        return nil;
+    }
+    STPPaymentIntentSetupFutureUsage setupFutureUsage = [self.setupFutureUsage integerValue];
+    switch (setupFutureUsage) {
+        case STPPaymentIntentSetupFutureUsageOnSession:
+            return @"on_session";
+        case STPPaymentIntentSetupFutureUsageOffSession:
+            return @"off_session";
+        case STPPaymentIntentSetupFutureUsageNone:
+        case STPPaymentIntentSetupFutureUsageUnknown:
+            return nil;
+    }
+}
+
+#pragma mark - Deprecated Properties
+
+- (NSString *)returnUrl {
+    return self.returnURL;
+}
+
+- (void)setReturnUrl:(NSString *)returnUrl {
+    self.returnURL = returnUrl;
+}
+
+- (NSNumber *)saveSourceToCustomer {
+    return self.savePaymentMethod;
+}
+
+- (void)setSaveSourceToCustomer:(NSNumber *)saveSourceToCustomer {
+    self.savePaymentMethod = saveSourceToCustomer;
 }
 
 #pragma mark - STPFormEncodable
@@ -63,11 +104,14 @@
 + (nonnull NSDictionary *)propertyNamesToFormFieldNamesMapping {
     return @{
              NSStringFromSelector(@selector(clientSecret)): @"client_secret",
+             NSStringFromSelector(@selector(paymentMethodParams)): @"payment_method_data",
+             NSStringFromSelector(@selector(paymentMethodId)): @"payment_method",
+             NSStringFromSelector(@selector(setupFutureUsageRawString)): @"setup_future_usage",
              NSStringFromSelector(@selector(sourceParams)): @"source_data",
              NSStringFromSelector(@selector(sourceId)): @"source",
              NSStringFromSelector(@selector(receiptEmail)): @"receipt_email",
-             NSStringFromSelector(@selector(saveSourceToCustomer)): @"save_source_to_customer",
-             NSStringFromSelector(@selector(returnUrl)): @"return_url",
+             NSStringFromSelector(@selector(savePaymentMethod)): @"save_payment_method",
+             NSStringFromSelector(@selector(returnURL)): @"return_url",
              };
 }
 

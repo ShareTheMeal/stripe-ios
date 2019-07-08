@@ -97,6 +97,10 @@
     return [self safeImageNamed:stpCardFormBackIdentifier templateIfAvailable:YES];
 }
 
++ (UIImage *)largeCardAmexCVCImage {
+    return [self safeImageNamed:@"stp_card_form_amex_cvc" templateIfAvailable:YES];
+}
+
 + (UIImage *)largeShippingImage {
     return [self safeImageNamed:@"stp_shipping_form" templateIfAvailable:YES];
 }
