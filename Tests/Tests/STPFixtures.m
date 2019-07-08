@@ -15,6 +15,7 @@ NSString *const STPTestJSONCustomer = @"Customer";
 NSString *const STPTestJSONCard = @"Card";
 
 NSString *const STPTestJSONPaymentIntent = @"PaymentIntent";
+NSString *const STPTestJSONPaymentMethod = @"PaymentMethod";
 
 NSString *const STPTestJSONSource3DS = @"3DSSource";
 NSString *const STPTestJSONSourceAlipay = @"AlipaySource";
@@ -85,6 +86,7 @@ NSString *const STPTestJSONSourceSOFORT = @"SOFORTSource";
                                 @"object": @"token",
                                 @"livemode": @NO,
                                 @"created": @1353025450.0,
+                                @"type": @"card",
                                 @"used": @NO,
                                 @"card": cardDict
                                 };
@@ -189,7 +191,7 @@ NSString *const STPTestJSONSourceSOFORT = @"SOFORTSource";
     return [STPSource decodedObjectFromAPIResponse:[STPTestUtils jsonNamed:STPTestJSONSourceAlipay]];
 }
 
-+ (STPSource *)alipaySourceWithNativeUrl {
++ (STPSource *)alipaySourceWithNativeURL {
     NSMutableDictionary *dictionary = [STPTestUtils jsonNamed:STPTestJSONSourceAlipay].mutableCopy;
     NSMutableDictionary *detailsDictionary = ((NSDictionary *)dictionary[@"alipay"]).mutableCopy;
     detailsDictionary[@"native_url"] = @"alipay://test";
@@ -280,6 +282,7 @@ NSString *const STPTestJSONSourceSOFORT = @"SOFORTSource";
 
     legalEntity.verification = [STPVerificationParams new];
     legalEntity.verification.document = @"file_abc";
+    legalEntity.verification.documentBack = @"file_def";
 
     STPPersonParams *jenny = [self personParams], *jacob = [self personParams];
     jenny.firstName = @"Jenny";

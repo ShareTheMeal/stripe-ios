@@ -92,9 +92,9 @@
     }];
 
     // Make sure the initWithSource: method pulled out the right values from the Source
-    XCTAssertNil(sut.nativeRedirectUrl);
-    XCTAssertEqualObjects(sut.redirectUrl, source.redirect.url);
-    XCTAssertEqualObjects(sut.returnUrl, source.redirect.returnURL);
+    XCTAssertNil(sut.nativeRedirectURL);
+    XCTAssertEqualObjects(sut.redirectURL, source.redirect.url);
+    XCTAssertEqualObjects(sut.returnURL, source.redirect.returnURL);
 
     // and make sure the completion calls the completion block above
     sut.completion(fakeError);
@@ -102,7 +102,7 @@
 }
 
 - (void)testInitWithSourceWithNativeURL {
-    STPSource *source = [STPFixtures alipaySourceWithNativeUrl];
+    STPSource *source = [STPFixtures alipaySourceWithNativeURL];
     __block BOOL completionCalled = NO;
     NSURL *nativeURL = [NSURL URLWithString:source.details[@"native_url"]];
     NSError *fakeError = [NSError new];
@@ -115,9 +115,9 @@
     }];
 
     // Make sure the initWithSource: method pulled out the right values from the Source
-    XCTAssertEqualObjects(sut.nativeRedirectUrl, nativeURL);
-    XCTAssertEqualObjects(sut.redirectUrl, source.redirect.url);
-    XCTAssertEqualObjects(sut.returnUrl, source.redirect.returnURL);
+    XCTAssertEqualObjects(sut.nativeRedirectURL, nativeURL);
+    XCTAssertEqualObjects(sut.redirectURL, source.redirect.url);
+    XCTAssertEqualObjects(sut.returnURL, source.redirect.returnURL);
 
     // and make sure the completion calls the completion block above
     sut.completion(fakeError);
@@ -136,20 +136,27 @@
     }];
 
     // Make sure the initWithPaymentIntent: method pulled out the right values from the PaymentIntent
-    XCTAssertNil(sut.nativeRedirectUrl);
-    XCTAssertEqualObjects(sut.redirectUrl.absoluteString,
+    XCTAssertNil(sut.nativeRedirectURL);
+    XCTAssertEqualObjects(sut.redirectURL.absoluteString,
                           @"https://hooks.stripe.com/redirect/authenticate/src_1Cl1AeIl4IdHmuTb1L7x083A?client_secret=src_client_secret_DBNwUe9qHteqJ8qQBwNWiigk");
-    XCTAssertEqualObjects(sut.returnUrl, paymentIntent.returnUrl);
+
+    // `nextSourceAction` & `authorizeWithURL` should just be aliases for `nextAction` & `redirectToURL`, already tested in `STPPaymentIntentTest`
+    XCTAssertNotNil(paymentIntent.nextAction.redirectToURL.returnURL);
+    XCTAssertEqualObjects(sut.returnURL, paymentIntent.nextAction.redirectToURL.returnURL);
 
     // and make sure the completion calls the completion block above
-    sut.completion(fakeError);
+    XCTAssertNotNil(sut);
+    if (sut.completion) {
+        sut.completion(fakeError);
+    }
     XCTAssertTrue(completionCalled);
 }
 
 - (void)testInitWithPaymentIntentFailures {
+    // Note next_action has been renamed to next_source_action in the API, but both still get sent down in the 2015-10-12 API
     NSMutableDictionary *json = [[STPTestUtils jsonNamed:STPTestJSONPaymentIntent] mutableCopy];
-    json[@"next_source_action"] = [json[@"next_source_action"] mutableCopy];
-    json[@"next_source_action"][@"value"] = [json[@"next_source_action"][@"value"] mutableCopy];
+    json[@"next_action"] = [json[@"next_action"] mutableCopy];
+    json[@"next_action"][@"redirect_to_url"] = [json[@"next_action"][@"redirect_to_url"] mutableCopy];
 
     void (^unusedCompletion)(NSString *, NSError *) = ^(__unused NSString * _Nonnull clientSecret, __unused NSError * _Nullable error) {
         XCTFail(@"should not be constructed, definitely not completed");
@@ -163,37 +170,25 @@
 
     XCTAssertNotNil(create(), @"before mutation of json, creation should succeed");
 
-    // `next_source_action` is not (currently) represented in the public API, and so there aren't
-    // any tests on it's decoding *other* than these right here. This is a white-box test for each condition
-    // that might result in a nil `STPRedirectContext`, because `STPRedirectContext` is the only place that
-    // understands `next_source_action` right now.
-
-    json[@"next_source_action"][@"value"][@"url"] = @"not a valid URL";
-    XCTAssertNil(create(), @"not created with an invalid URL in next_source_action.value.url");
-
-    json[@"next_source_action"][@"value"][@"url"] = @[@"an array", @"not a string"];
-    XCTAssertNil(create(), @"not created with a non-string next_source_action.value.url");
-
-    json[@"next_source_action"][@"value"] = @"not a dictionary";
-    XCTAssertNil(create(), @"not created with a non-dictionary next_source_action.value");
-
-    json[@"next_source_action"][@"value"] = @{ @"url": @"http://example.com/" };
-    json[@"next_source_action"][@"type"] = @"not_authorize_with_url";
-    XCTAssertNil(create(), @"not created with wrong next_source_action.type");
-
-    json[@"next_source_action"][@"type"] = @"authorize_with_url";
-    NSString *correctStatus = json[@"status"];
     json[@"status"] = @"processing";
     XCTAssertNil(create(), @"not created with wrong status");
+    json[@"status"] = @"requires_source_action";
 
-    json[@"status"] = correctStatus;
-    NSDictionary *nextSourceAction = json[@"next_source_action"];
-    json[@"next_source_action"] = @"not a dictionary";
-    XCTAssertNil(create(), @"not created with a non-dictionary next_source_action");
+    json[@"next_action"][@"type"] = @"not_redirect_to_url";
+    XCTAssertNil(create(), @"not created with wrong next_action.type");
+    json[@"next_action"][@"type"] = @"redirect_to_url";
 
-    json[@"next_source_action"] = nextSourceAction;
-    json[@"return_url"] = @"not a url";
+    NSString *correctURL = json[@"next_action"][@"redirect_to_url"][@"url"];
+    json[@"next_action"][@"redirect_to_url"][@"url"] = @"not a valid URL";
+    XCTAssertNil(create(), @"not created with an invalid URL in next_action.redirect_to_url.url");
+    json[@"next_action"][@"redirect_to_url"][@"url"] = correctURL;
+
+    NSString *correctReturnURL = json[@"next_action"][@"redirect_to_url"][@"return_url"];
+    json[@"next_action"][@"redirect_to_url"][@"return_url"] = @"not a url";
     XCTAssertNil(create(), @"not created with invalid returnUrl");
+    json[@"next_action"][@"redirect_to_url"][@"return_url"] = correctReturnURL;
+
+    XCTAssertNotNil(create(), @"works again when everything is back to normal");
 }
 
 /**
@@ -245,7 +240,7 @@
         XCTAssertNil(error);
         [exp fulfill];
     }];
-    XCTAssertEqualObjects(source.redirect.returnURL, context.returnUrl);
+    XCTAssertEqualObjects(source.redirect.returnURL, context.returnURL);
     id sut = OCMPartialMock(context);
 
     [sut startSafariViewControllerRedirectFlowFromViewController:mockVC];
@@ -291,7 +286,7 @@
     BOOL(^checker)(id) = ^BOOL(id vc) {
         if ([vc isKindOfClass:[SFSafariViewController class]]) {
             NSURL *url = [NSURL URLWithString:@"my-app://some_path"];
-            XCTAssertNotEqualObjects(url, context.returnUrl);
+            XCTAssertNotEqualObjects(url, context.returnURL);
             [[STPURLCallbackHandler shared] handleURLCallback:url];
             return YES;
         }
@@ -568,7 +563,7 @@
  url, an app to app redirect should attempt to be initiated.
  */
 - (void)testNativeRedirectSupportingSourceFlow_validNativeURL {
-    STPSource *source = [STPFixtures alipaySourceWithNativeUrl];
+    STPSource *source = [STPFixtures alipaySourceWithNativeURL];
     NSURL *sourceURL = [NSURL URLWithString:source.details[@"native_url"]];
 
     STPRedirectContext *context = [[STPRedirectContext alloc] initWithSource:source
@@ -576,8 +571,8 @@
         XCTFail(@"completion called");
     }];
 
-    XCTAssertNotNil(context.nativeRedirectUrl);
-    XCTAssertEqualObjects(context.nativeRedirectUrl, sourceURL);
+    XCTAssertNotNil(context.nativeRedirectURL);
+    XCTAssertEqualObjects(context.nativeRedirectURL, sourceURL);
 
     id sut = OCMPartialMock(context);
 
@@ -620,7 +615,7 @@
                                                                   completion:^(__unused NSString *sourceID, __unused NSString *clientSecret, __unused NSError *error) {
                                                                       XCTFail(@"completion called");
                                                                   }];
-    XCTAssertNil(context.nativeRedirectUrl);
+    XCTAssertNil(context.nativeRedirectURL);
 
     id sut = OCMPartialMock(context);
 

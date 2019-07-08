@@ -16,7 +16,7 @@ class CheckoutViewController: UIViewController, STPPaymentContextDelegate {
     let stripePublishableKey = ""
 
     // 2) Next, optionally, to have this demo save your user's payment details, head to
-    // https://github.com/stripe/example-ios-backend/tree/v13.1.0, click "Deploy to Heroku", and follow
+    // https://github.com/stripe/example-ios-backend/tree/v14.0.0, click "Deploy to Heroku", and follow
     // the instructions (don't worry, it's free). Replace nil on the line below with your
     // Heroku URL (it looks like https://blazing-sunrise-1234.herokuapp.com ).
     let backendBaseURL: String? = nil
@@ -59,6 +59,8 @@ class CheckoutViewController: UIViewController, STPPaymentContextDelegate {
         }
     }
 
+    private var redirectContext: STPRedirectContext?
+
     init(product: String, price: Int, settings: Settings) {
 
         let stripePublishableKey = self.stripePublishableKey
@@ -80,7 +82,7 @@ class CheckoutViewController: UIViewController, STPPaymentContextDelegate {
         config.requiredBillingAddressFields = settings.requiredBillingAddressFields
         config.requiredShippingAddressFields = settings.requiredShippingAddressFields
         config.shippingType = settings.shippingType
-        config.additionalPaymentMethods = settings.additionalPaymentMethods
+        config.additionalPaymentOptions = settings.additionalPaymentOptions
 
         // Create card sources instead of card tokens
         config.createCardSources = true;
@@ -96,7 +98,7 @@ class CheckoutViewController: UIViewController, STPPaymentContextDelegate {
 
         let paymentSelectionFooter = PaymentContextFooterView(text: "You can add custom footer views to the payment selection screen.")
         paymentSelectionFooter.theme = settings.theme
-        paymentContext.paymentMethodsViewControllerFooterView = paymentSelectionFooter
+        paymentContext.paymentOptionsViewControllerFooterView = paymentSelectionFooter
 
         let addCardFooter = PaymentContextFooterView(text: "You can add custom footer views to the add card screen.")
         addCardFooter.theme = settings.theme
@@ -155,7 +157,7 @@ class CheckoutViewController: UIViewController, STPPaymentContextDelegate {
         self.buyButton.addTarget(self, action: #selector(didTapBuy), for: .touchUpInside)
         self.totalRow.detail = self.numberFormatter.string(from: NSNumber(value: Float(self.paymentContext.paymentAmount)/100))!
         self.paymentRow.onTap = { [weak self] in
-            self?.paymentContext.pushPaymentMethodsViewController()
+            self?.paymentContext.pushPaymentOptionsViewController()
         }
         self.shippingRow.onTap = { [weak self]  in
             self?.paymentContext.pushShippingViewController()
@@ -188,14 +190,77 @@ class CheckoutViewController: UIViewController, STPPaymentContextDelegate {
         self.paymentContext.requestPayment()
     }
 
+    private func performAction(for paymentIntent: STPPaymentIntent, completion: @escaping STPErrorBlock) {
+        if self.redirectContext != nil {
+            completion(NSError(domain: StripeDomain, code: 123, userInfo: [NSLocalizedDescriptionKey: "Should not have multiple concurrent redirects."]))
+            return
+        }
+
+        if let redirectContext = STPRedirectContext(paymentIntent: paymentIntent, completion: { [weak self] (clientSecret, error) in
+            self?.redirectContext = nil
+            if error != nil {
+                completion(error)
+            } else {
+                STPAPIClient.shared().retrievePaymentIntent(withClientSecret: clientSecret, completion: { (retrievedIntent, retrieveError) in
+                    if retrieveError != nil {
+                        completion(retrieveError)
+                    } else {
+                        if let retrievedIntent = retrievedIntent {
+                            MyAPIClient.sharedClient.confirmPaymentIntent(retrievedIntent
+                                , completion: { (confirmedIntent, confirmError) in
+                                    if confirmError != nil {
+                                        completion(confirmError)
+                                    } else {
+                                        if let confirmedIntent: STPPaymentIntent = confirmedIntent {
+                                            if confirmedIntent.status == .requiresAction {
+                                                self?.performAction(for: confirmedIntent, completion: completion)
+                                            } else {
+                                                // success
+                                                completion(nil)
+                                            }
+                                        } else {
+                                            completion(NSError(domain: StripeDomain, code: 123, userInfo: [NSLocalizedDescriptionKey: "Error parsing confirmed payment intent"]))
+                                        }
+                                    }
+                            })
+                        } else {
+                             completion(NSError(domain: StripeDomain, code: 123, userInfo: [NSLocalizedDescriptionKey: "Error retrieving payment intent"]))
+                        }
+                    }
+                })
+            }
+            }) {
+            self.redirectContext = redirectContext
+            redirectContext.startRedirectFlow(from: self)
+        } else {
+            completion(NSError(domain: StripeDomain, code: 123, userInfo: [NSLocalizedDescriptionKey: "Unable to create redirect context for payment intent."]))
+        }
+    }
+
     // MARK: STPPaymentContextDelegate
 
     func paymentContext(_ paymentContext: STPPaymentContext, didCreatePaymentResult paymentResult: STPPaymentResult, completion: @escaping STPErrorBlock) {
-        MyAPIClient.sharedClient.completeCharge(paymentResult,
-                                                amount: self.paymentContext.paymentAmount,
-                                                shippingAddress: self.paymentContext.shippingAddress,
-                                                shippingMethod: self.paymentContext.selectedShippingMethod,
-                                                completion: completion)
+        MyAPIClient.sharedClient.createAndConfirmPaymentIntent(paymentResult,
+                                                               amount: self.paymentContext.paymentAmount,
+                                                               returnURL: "payments-example://stripe-redirect",
+                                                               shippingAddress: self.paymentContext.shippingAddress,
+                                                               shippingMethod: self.paymentContext.selectedShippingMethod) { (paymentIntent, error) in
+                                                                if error != nil {
+                                                                    completion(error)
+                                                                } else {
+                                                                    if let paymentIntent = paymentIntent {
+                                                                        if paymentIntent.status == .requiresAction {
+                                                                            self.performAction(for: paymentIntent, completion: completion)
+                                                                        } else {
+                                                                            // successful
+                                                                            completion(nil)
+                                                                        }
+                                                                    } else {
+                                                                        let err = NSError(domain: StripeDomain, code: 123, userInfo: [NSLocalizedDescriptionKey: "Unable to parse payment intent from response"])
+                                                                        completion(err)
+                                                                    }
+                                                                }
+        }
     }
 
     func paymentContext(_ paymentContext: STPPaymentContext, didFinishWith status: STPPaymentStatus, error: Error?) {
@@ -220,8 +285,8 @@ class CheckoutViewController: UIViewController, STPPaymentContextDelegate {
 
     func paymentContextDidChange(_ paymentContext: STPPaymentContext) {
         self.paymentRow.loading = paymentContext.loading
-        if let paymentMethod = paymentContext.selectedPaymentMethod {
-            self.paymentRow.detail = paymentMethod.label
+        if let paymentOption = paymentContext.selectedPaymentOption {
+            self.paymentRow.detail = paymentOption.label
         }
         else {
             self.paymentRow.detail = "Select Payment"
