@@ -15,6 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 typedef NS_ENUM(NSInteger, STPIntentActionUseStripeSDKType) {
     STPIntentActionUseStripeSDKTypeUnknown = 0,
     STPIntentActionUseStripeSDKType3DS2Fingerprint,
+    STPIntentActionUseStripeSDKType3DS2Redirect,
 };
 
 @interface STPIntentActionUseStripeSDK : NSObject <STPAPIResponseDecodable>
@@ -27,9 +28,19 @@ typedef NS_ENUM(NSInteger, STPIntentActionUseStripeSDKType) {
 @property (nonatomic, readonly) STPIntentActionUseStripeSDKType type;
 
 #pragma mark - 3DS2 Fingerprint
-@property (nonatomic, nullable, copy, readonly) NSString *directoryServer;
+@property (nonatomic, nullable, copy, readonly) NSString *directoryServerName;
+@property (nonatomic, copy, readonly) NSString *directoryServerID;
+/// PEM encoded DS certificate
+@property (nonatomic, copy, readonly) NSString *directoryServerCertificate;
+@property (nonatomic, readonly) NSArray<NSString *> *rootCertificateStrings;
+/// A Visa-specific field
+@property (nonatomic, nullable, copy, readonly) NSString *directoryServerKeyID;
+
 @property (nonatomic, nullable, copy, readonly) NSString *serverTransactionID;
 @property (nonatomic, nullable, copy, readonly) NSString *threeDS2SourceID;
+
+#pragma mark - 3DS2 Redirect
+@property (nonatomic, nullable, readonly) NSURL *redirectURL;
 
 @end
 

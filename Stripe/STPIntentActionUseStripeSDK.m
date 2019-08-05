@@ -22,10 +22,15 @@ NS_ASSUME_NONNULL_BEGIN
                                [NSString stringWithFormat:@"%@: %p", NSStringFromClass([self class]), self],
                                
                                // IntentActionUseStripeSDK details (alphabetical)
-                               [NSString stringWithFormat:@"directoryServer = %@", self.directoryServer],
+                               [NSString stringWithFormat:@"directoryServer = %@", self.directoryServerName],
+                               [NSString stringWithFormat:@"directoryServerID = %@", self.directoryServerID],
+                               [NSString stringWithFormat:@"directoryServerKeyID = %@", self.directoryServerKeyID],
                                [NSString stringWithFormat:@"serverTransactionID = %@", self.serverTransactionID],
+                               [NSString stringWithFormat:@"directoryServerCertificate = %@", self.directoryServerCertificate.length > 0 ? @"<redacted>" : nil],
+                               [NSString stringWithFormat:@"rootCertificateStrings = %@", self.rootCertificateStrings.count > 0 ? @"<redacted>" : nil],
                                [NSString stringWithFormat:@"threeDS2SourceID = %@", self.threeDS2SourceID],
                                [NSString stringWithFormat:@"type = %@", self.allResponseFields[@"type"]],
+                               [NSString stringWithFormat:@"redirectURL = %@", self.redirectURL],
                                
                                ] mutableCopy];
     
@@ -42,23 +47,58 @@ NS_ASSUME_NONNULL_BEGIN
     NSString *typeString = [dict stp_stringForKey:@"type"];
     if ([typeString isEqualToString:@"stripe_3ds2_fingerprint"]) {
         type = STPIntentActionUseStripeSDKType3DS2Fingerprint;
-    }
-
-    if (type == STPIntentActionUseStripeSDKTypeUnknown) {
-        return nil;
+    } else if ([typeString isEqualToString:@"three_d_secure_redirect"]) {
+        type = STPIntentActionUseStripeSDKType3DS2Redirect;
     }
 
     NSString *directoryServer = [dict stp_stringForKey:@"directory_server_name"];
-    if (directoryServer == nil || directoryServer.length == 0) {
-        return nil;
+
+
+    NSDictionary *encryptionInfo = [dict stp_dictionaryForKey:@"directory_server_encryption"];
+
+
+    NSString *certificate = [encryptionInfo stp_stringForKey:@"certificate"];
+    NSArray<NSString *> *rootCertificates = [encryptionInfo stp_arrayForKey:@"root_certificate_authorities"];
+    NSString *directoryServerID = [encryptionInfo stp_stringForKey:@"directory_server_id"];
+
+    NSString *directoryServerKeyID = [encryptionInfo stp_stringForKey:@"key_id"];
+
+    NSURL *redirectURL = [dict stp_urlForKey:@"stripe_js"];
+
+    // required checks
+    switch (type) {
+        case STPIntentActionUseStripeSDKType3DS2Fingerprint:
+            if (directoryServer == nil || directoryServer.length == 0) {
+                return nil;
+            } else if (encryptionInfo == nil) {
+                return nil;
+            } else if (certificate.length == 0 || directoryServerID.length == 0) {
+                return nil;
+            }
+            break;
+
+        case STPIntentActionUseStripeSDKType3DS2Redirect:
+            if (redirectURL == nil) {
+                return nil;
+            }
+            break;
+
+        case STPIntentActionUseStripeSDKTypeUnknown:
+            break;
     }
+
 
 
     STPIntentActionUseStripeSDK *action = [[self alloc] init];
     action->_type = type;
-    action->_directoryServer = [directoryServer copy];
+    action->_directoryServerName = [directoryServer copy];
+    action->_directoryServerCertificate = [certificate copy];
+    action->_rootCertificateStrings = rootCertificates;
+    action->_directoryServerID = [directoryServerID copy];
+    action->_directoryServerKeyID = [directoryServerKeyID copy];
     action->_serverTransactionID = [[dict stp_stringForKey:@"server_transaction_id"] copy];
     action->_threeDS2SourceID = [[dict stp_stringForKey:@"three_d_secure_2_source"] copy];
+    action->_redirectURL = redirectURL;
     action->_allResponseFields = dict;
     return action;
 }

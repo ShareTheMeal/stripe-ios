@@ -7,7 +7,7 @@
 //
 
 #import <XCTest/XCTest.h>
-#import <Stripe3DS2/STDSTextFieldCustomization.h>
+#import <Stripe/STDSTextFieldCustomization.h>
 
 #import "STPThreeDSTextFieldCustomization.h"
 #import "STPThreeDSCustomization+Private.h"
@@ -35,8 +35,8 @@
     XCTAssertEqual(UIColor.blueColor, stdsCustomization.textColor);
     XCTAssertEqual(stdsCustomization.textColor, customization.textColor);
     
-    XCTAssertEqual(-1, stdsCustomization.borderWidth);
-    XCTAssertEqual(stdsCustomization.borderWidth, customization.borderWidth);
+    XCTAssertEqualWithAccuracy(-1, stdsCustomization.borderWidth, 0.1);
+    XCTAssertEqualWithAccuracy(stdsCustomization.borderWidth, customization.borderWidth, 0.1);
     
     XCTAssertEqual(UIColor.redColor, stdsCustomization.borderColor);
     XCTAssertEqual(stdsCustomization.borderColor, customization.borderColor);

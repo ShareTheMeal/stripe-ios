@@ -18,7 +18,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  The current version of this library.
  */
-static NSString *const STPSDKVersion = @"15.0.1";
+static NSString *const STPSDKVersion = @"16.0.3";
 
 @class STPBankAccount, STPBankAccountParams, STPCard, STPCardParams, STPConnectAccountParams;
 @class STPPaymentConfiguration, STPPaymentIntentParams, STPSourceParams, STPToken, STPPaymentMethodParams;
@@ -369,7 +369,9 @@ static NSString *const STPSDKVersion = @"15.0.1";
  At a minimum, the params object must include the `clientSecret`.
 
  @see https://stripe.com/docs/api#confirm_payment_intent
-
+ 
+ @note Use the `confirmPayment:withAuthenticationContext:completion:` method on `STPPaymentHandler` instead
+ of calling this method directly. It handles any authentication necessary for you. @see https://stripe.com/docs/mobile/ios/authentication
  @param paymentIntentParams  The `STPPaymentIntentParams` to pass to `/confirm`
  @param completion           The callback to run with the returned PaymentIntent object, or an error.
  */
@@ -400,7 +402,9 @@ static NSString *const STPSDKVersion = @"15.0.1";
  At a minimum, the params object must include the `clientSecret`.
  
  @see https://stripe.com/docs/api/setup_intents/confirm
- 
+
+ @note Use the `confirmSetupIntent:withAuthenticationContext:completion:` method on `STPPaymentHandler` instead
+ of calling this method directly. It handles any authentication necessary for you. @see https://stripe.com/docs/mobile/ios/authentication
  @param setupIntentParams    The `STPSetupIntentParams` to pass to `/confirm`
  @param completion           The callback to run with the returned PaymentIntent object, or an error.
  */

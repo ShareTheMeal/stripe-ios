@@ -9,7 +9,7 @@
 #import "STPThreeDSTextFieldCustomization.h"
 
 #import "STPThreeDSCustomization+Private.h"
-#import <Stripe3DS2/STDSTextFieldCustomization.h>
+#import <Stripe/STDSTextFieldCustomization.h>
 
 @implementation STPThreeDSTextFieldCustomization
 
@@ -25,11 +25,11 @@
     return self;
 }
 
-- (NSInteger)borderWidth {
+- (CGFloat)borderWidth {
     return self.textFieldCustomization.borderWidth;
 }
 
-- (void)setBorderWidth:(NSInteger)borderWidth {
+- (void)setBorderWidth:(CGFloat)borderWidth {
     self.textFieldCustomization.borderWidth = borderWidth;
 }
 
