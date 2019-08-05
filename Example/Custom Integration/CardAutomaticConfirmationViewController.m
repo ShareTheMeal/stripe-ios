@@ -1,6 +1,6 @@
 //
 //  CardAutomaticConfirmationViewController.m
-//  Custom Integration (Recommended)
+//  Custom Integration
 //
 //  Created by Daniel Jackson on 7/5/18.
 //  Copyright © 2018 Stripe. All rights reserved.
@@ -40,7 +40,7 @@
     self.edgesForExtendedLayout = UIRectEdgeNone;
 
     STPPaymentCardTextField *paymentTextField = [[STPPaymentCardTextField alloc] init];
-    STPCardParams *cardParams = [STPCardParams new];
+    STPPaymentMethodCardParams *cardParams = [STPPaymentMethodCardParams new];
     // Only successful 3D Secure transactions on this test card will succeed.
     cardParams.number = @"4000000000003063";
     paymentTextField.cardParams = cardParams;
@@ -123,37 +123,20 @@
             return;
         }
 
-        STPAPIClient *stripeClient = [STPAPIClient sharedClient];
         STPPaymentIntentParams *paymentIntentParams = [[STPPaymentIntentParams alloc] initWithClientSecret:clientSecret];
-
-        STPPaymentMethodCardParams *cardParams = [[STPPaymentMethodCardParams alloc] initWithCardSourceParams:self.paymentTextField.cardParams];
-        
-
-        paymentIntentParams.paymentMethodParams = [STPPaymentMethodParams paramsWithCard:cardParams
+        paymentIntentParams.paymentMethodParams = [STPPaymentMethodParams paramsWithCard:self.paymentTextField.cardParams
                                                                           billingDetails:nil
                                                                                 metadata:nil];
         paymentIntentParams.returnURL = @"payments-example://stripe-redirect";
-
-        [stripeClient confirmPaymentIntentWithParams:paymentIntentParams completion:^(STPPaymentIntent * _Nullable paymentIntent, NSError * _Nullable error) {
-            if (error) {
-                [self.delegate exampleViewController:self didFinishWithError:error];
-                return;
-            }
-
-            if (paymentIntent.status == STPPaymentIntentStatusRequiresAction) {
-                [self.delegate performRedirectForViewController:self
-                                              withPaymentIntent:paymentIntent
-                                                     completion:^(STPPaymentIntent *retrievedIntent, NSError *error) {
-                                                         if (error) {
-                                                             [self.delegate exampleViewController:self didFinishWithError:error];
-                                                         } else {
-                                                             [self finishWithStatus:retrievedIntent.status];
-                                                         }
-                                                     }];
-            } else {
-                [self finishWithStatus:paymentIntent.status];
-            }
-        }];
+        [[STPPaymentHandler sharedHandler] confirmPayment:paymentIntentParams
+                                withAuthenticationContext:self.delegate
+                                               completion:^(STPPaymentHandlerActionStatus handlerStatus, STPPaymentIntent * _Nullable handledIntent, NSError * _Nullable handlerError) {
+                                                   if (handlerError != nil) {
+                                                       [self.delegate exampleViewController:self didFinishWithError:error];
+                                                   } else {
+                                                       [self finishWithStatus:handledIntent.status];
+                                                   }
+                                               }];
     }];
 }
 

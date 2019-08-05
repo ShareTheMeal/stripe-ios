@@ -1,6 +1,6 @@
 //
 //  BrowseExamplesViewController.m
-//  Custom Integration (Recommended)
+//  Custom Integration
 //
 //  Created by Ben Guo on 2/17/17.
 //  Copyright © 2017 Stripe. All rights reserved.
@@ -306,41 +306,10 @@
     });
 }
 
-- (void)performRedirectForViewController:(UIViewController *)controller
-                       withPaymentIntent:(STPPaymentIntent *)paymentIntent
-                              completion:(STPRedirectCompletionHandler)completion {
-    if (_redirectContext != nil) {
-        [self _callOnMainThread:^{ completion(nil,[NSError errorWithDomain:StripeDomain
-                                           code:STPInvalidRequestError
-                                       userInfo:@{NSLocalizedDescriptionKey: [NSString stringWithFormat:@"%@ should not have multiple concurrent redirects.", NSStringFromClass([self class])]}]); }];
-        return;
-    }
-    __weak __typeof(self) weakSelf = self;
-    STPRedirectContext *redirectContext = [[STPRedirectContext alloc] initWithPaymentIntent:paymentIntent completion:^(NSString * _Nonnull clientSecret, NSError * _Nullable error) {
+#pragma mark - STPAuthenticationContext
 
-        if (error != nil) {
-            [self _callOnMainThread:^{ completion(nil, error); }];
-        } else {
-
-        [[STPAPIClient sharedClient] retrievePaymentIntentWithClientSecret:clientSecret
-                                                                completion:^(STPPaymentIntent * _Nullable retrievedIntent, NSError * _Nullable error) {
-                                                                    [self _callOnMainThread:^{ completion(retrievedIntent, error); }];
-                                                                }];
-        }
-        __typeof(self) strongSelf = weakSelf;
-        if (strongSelf != nil) {
-            strongSelf->_redirectContext = nil;
-        }
-    }];
-
-    if (redirectContext) {
-        _redirectContext = redirectContext;
-        [redirectContext startRedirectFlowFromViewController:controller];
-    } else {
-        [self _callOnMainThread:^{ completion(nil,[NSError errorWithDomain:StripeDomain
-                                           code:STPInvalidRequestError
-                                       userInfo:@{NSLocalizedDescriptionKey: @"Internal error creating redirect context."}]); }];
-    }
+- (UIViewController *)authenticationPresentingViewController {
+    return self.navigationController.topViewController;
 }
 
 @end
