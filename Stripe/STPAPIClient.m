@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 #import <sys/utsname.h>
 
-#import <Stripe3DS2/Stripe3DS2.h>
+#import <Stripe/Stripe3DS2.h>
 
 #import "STPAPIClient.h"
 #import "STPAPIClient+ApplePay.h"
@@ -656,7 +656,8 @@ toCustomerUsingKey:(STPEphemeralKey *)ephemeralKey
 
 - (void)authenticate3DS2:(STDSAuthenticationRequestParameters *)authRequestParams
         sourceIdentifier:(NSString *)sourceID
-              maxTimeout:(NSTimeInterval)maxTimeout
+               returnURL:(nullable NSString *)returnURLString
+              maxTimeout:(NSInteger)maxTimeout
               completion:(STP3DS2AuthenticateCompletionBlock)completion {
     NSString *endpoint = [NSString stringWithFormat:@"%@/authenticate", APIEndpoint3DS2];
 
@@ -664,13 +665,19 @@ toCustomerUsingKey:(STPEphemeralKey *)ephemeralKey
     appParams[@"deviceRenderOptions"] = @{@"sdkInterface": @"03",
                                           @"sdkUiType": @[@"01", @"02", @"03", @"04", @"05"],
                                           };
-    appParams[@"sdkMaxTimeout"] = @(maxTimeout / 60);
+    appParams[@"sdkMaxTimeout"] = [NSString stringWithFormat:@"%02ld", (long)maxTimeout];
     NSData *appData = [NSJSONSerialization dataWithJSONObject:appParams options:NSJSONWritingPrettyPrinted error:NULL];
+
+    NSMutableDictionary *params = [@{@"app": [[NSString alloc] initWithData:appData encoding:NSUTF8StringEncoding],
+                                    @"source": sourceID,
+                                     } mutableCopy];
+    if (returnURLString != nil) {
+        params[@"fallback_return_url"] = returnURLString;
+    }
+
      [STPAPIRequest<STP3DS2AuthenticateResponse *> postWithAPIClient:self
                                                             endpoint:endpoint
-                                                          parameters:@{@"app": [[NSString alloc] initWithData:appData encoding:NSUTF8StringEncoding],
-                                                                       @"source": sourceID,
-                                                                       }
+                                                          parameters:[params copy]
                                                         deserializer:[STP3DS2AuthenticateResponse new]
                                                           completion:^(STP3DS2AuthenticateResponse *authenticateResponse, __unused NSHTTPURLResponse *response, NSError *error) {
                                                               completion(authenticateResponse, error);
@@ -763,6 +770,11 @@ toCustomerUsingKey:(STPEphemeralKey *)ephemeralKey
 - (void)confirmSetupIntentWithParams:(STPSetupIntentConfirmParams *)setupIntentParams
                             completion:(STPSetupIntentCompletionBlock)completion {
     NSCAssert(setupIntentParams.clientSecret != nil, @"'clientSecret' is required to confirm a SetupIntent");
+
+    NSString *paymentMethodType = [STPPaymentMethod stringFromType:setupIntentParams.paymentMethodParams.type];
+    [[STPAnalyticsClient sharedClient] logSetupIntentConfirmationAttemptWithConfiguration:self.configuration
+                                                                        paymentMethodType:paymentMethodType];
+
     NSString *identifier = [STPSetupIntent idFromClientSecret:setupIntentParams.clientSecret];
     NSString *endpoint = [NSString stringWithFormat:@"%@/%@/confirm", APIEndpointSetupIntents, identifier];
     NSDictionary *params = [STPFormEncoder dictionaryForObject:setupIntentParams];
@@ -790,6 +802,9 @@ toCustomerUsingKey:(STPEphemeralKey *)ephemeralKey
                                              parameters:[STPFormEncoder dictionaryForObject:paymentMethodParams]
                                            deserializer:[STPPaymentMethod new]
                                              completion:^(STPPaymentMethod *paymentMethod, __unused NSHTTPURLResponse *response, NSError *error) {
+                                                 if (error == nil && paymentMethod != nil) {
+                                                     [[STPAnalyticsClient sharedClient] logPaymentMethodCreationSucceededWithConfiguration:self.configuration paymentMethodID:paymentMethod.stripeId];
+                                                 }
                                                  completion(paymentMethod, error);
                                              }];
 

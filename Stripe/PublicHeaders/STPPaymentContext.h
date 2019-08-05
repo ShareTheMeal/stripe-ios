@@ -11,6 +11,7 @@
 #import <PassKit/PassKit.h>
 
 #import "STPAddress.h"
+#import "STPAuthenticationContext.h"
 #import "STPBlocks.h"
 #import "STPPaymentConfiguration.h"
 #import "STPPaymentOption.h"
@@ -29,7 +30,7 @@ NS_ASSUME_NONNULL_BEGIN
  
  `STPPaymentContext` saves information about a user's payment methods to a Stripe customer object, and requires an `STPCustomerContext` to manage retrieving and modifying the customer.
  */
-@interface STPPaymentContext : NSObject
+@interface STPPaymentContext : NSObject <STPAuthenticationContext>
 
 /**
  This is a convenience initializer; it is equivalent to calling 
@@ -135,6 +136,15 @@ NS_ASSUME_NONNULL_BEGIN
  Whether or not the payment context is currently loading information from the network.
  */
 @property (nonatomic, readonly) BOOL loading;
+
+/**
+ The Stripe ID of a payment method to display as the default pre-selected option.
+ 
+ Customer doesn't have a default payment method property, but you can store one (in its metadata, for example) and set this property accordingly.
+
+ @note Set this property immediately after initializing STPPaymentContext, or call `retryLoading` afterwards.
+ */
+@property (nonatomic, copy, nullable) NSString *defaultPaymentMethod;
 
 /**
  The user's currently selected payment option. May be nil.
@@ -361,11 +371,11 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)paymentContextDidChange:(STPPaymentContext *)paymentContext;
 
 /**
- Inside this method, you should make a call to your backend API to make a charge with that Customer + source, and invoke the `completion` block when that is done.
+ Inside this method, you should make a call to your backend API to make a PaymentIntent with that Customer + payment method, and invoke the `completion` block when that is done.
 
  @param paymentContext The context that succeeded
  @param paymentResult  Information associated with the payment that you can pass to your server. You should go to your backend API with this payment result and use the PaymentIntent API to complete the payment. See https://stripe.com/docs/mobile/ios/standard#submit-payment-intents. Once that's done call the `completion` block with any error that occurred (or none, if the payment succeeded). @see STPPaymentResult.h
- @param completion     Call this block when you're done creating a charge (or subscription, etc) on your backend. If it succeeded, call `completion(nil)`. If it failed with an error, call `completion(error)`.
+ @param completion     Call this block when you're done creating a payment intent (or subscription, etc) on your backend. If it succeeded, call `completion(nil)`. If it failed with an error, call `completion(error)`.
  */
 - (void)paymentContext:(STPPaymentContext *)paymentContext
 didCreatePaymentResult:(STPPaymentResult *)paymentResult
